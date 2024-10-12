@@ -15,7 +15,12 @@
 <p>Generate a Spotify playlist of UK number 1 singles on all your past birthdays.</p>
 <label>
 	Your date of birth:
-	<input type="date" bind:value={selectedDateString} />
+	<input
+		type="date"
+		bind:value={selectedDateString}
+		min="1900-01-01"
+		max={currentDate.toISOString().split('T')[0]}
+	/>
 </label>
 {#if isBirthday}
 	<p>Happy Birthday!</p>
