@@ -2,7 +2,7 @@
 	const currentDate = new Date();
 	let selectedDateString: string | undefined = undefined;
 	$: selectedDate = selectedDateString ? new Date(selectedDateString) : undefined;
-	$: isBirthday =
+	$: isTodayBirthday =
 		selectedDate?.getDate() === currentDate.getDate() &&
 		selectedDate?.getMonth() === currentDate.getMonth();
 
@@ -22,7 +22,7 @@
 		max={currentDate.toISOString().split('T')[0]}
 	/>
 </label>
-{#if isBirthday}
+{#if isTodayBirthday}
 	<p>Happy Birthday!</p>
 {/if}
 <div>
