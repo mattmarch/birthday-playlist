@@ -1,5 +1,5 @@
 import { DateTime, Interval } from 'luxon';
-import { findLast } from 'lodash';
+import findLast from 'lodash/findLast';
 
 const chartJsonUrl =
 	'https://raw.githubusercontent.com/mattmarch/birthday-playlist/refs/heads/chart-data/charts.json';

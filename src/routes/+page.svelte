@@ -1,14 +1,33 @@
 <script lang="ts">
+	import {
+		findBirthdayNumberOnes,
+		getChartData,
+		type BirthdayNumberOnes,
+		type ChartData
+	} from '$lib/chart-data';
+	import { onMount } from 'svelte';
+
 	const currentDate = new Date();
+	const minDate = new Date(1900, 0, 1);
 	let selectedDateString: string | undefined = undefined;
 	$: selectedDate = selectedDateString ? new Date(selectedDateString) : undefined;
 	$: isTodayBirthday =
 		selectedDate?.getDate() === currentDate.getDate() &&
 		selectedDate?.getMonth() === currentDate.getMonth();
 
-	const onClick = () => {
-		console.log(selectedDateString && new Date(selectedDateString));
-	};
+	let chartData: ChartData | undefined = undefined;
+	onMount(async () => {
+		chartData = await getChartData();
+	});
+
+	let birthdayNumberOnes: BirthdayNumberOnes | undefined;
+	$: {
+		if (!selectedDate || !chartData || selectedDate < minDate || selectedDate > currentDate) {
+			birthdayNumberOnes = undefined;
+		} else {
+			birthdayNumberOnes = findBirthdayNumberOnes(selectedDate, chartData);
+		}
+	}
 </script>
 
 <h1>Birthday Playlist Generator</h1>
@@ -18,7 +37,7 @@
 	<input
 		type="date"
 		bind:value={selectedDateString}
-		min="1900-01-01"
+		min={minDate.toISOString().split('T')[0]}
 		max={currentDate.toISOString().split('T')[0]}
 	/>
 </label>
@@ -26,5 +45,12 @@
 	<p>Happy Birthday!</p>
 {/if}
 <div>
-	<button on:click={onClick}>Generate Playlist</button>
+	{#if birthdayNumberOnes}
+		{#each birthdayNumberOnes as item}
+			<div>
+				<p>{item.numberOne?.title}</p>
+				<p><i>{item.numberOne?.artist}</i></p>
+			</div>
+		{/each}
+	{/if}
 </div>
