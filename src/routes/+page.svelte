@@ -5,6 +5,7 @@
 		type BirthdayNumberOnes,
 		type ChartData
 	} from '$lib/chart-data';
+	import { SpotifyClient } from '$lib/spotify';
 	import { onMount } from 'svelte';
 
 	const currentDate = new Date();
@@ -16,8 +17,10 @@
 		selectedDate?.getMonth() === currentDate.getMonth();
 
 	let chartData: ChartData | undefined = undefined;
+	let spotifyClient: SpotifyClient | undefined = undefined;
 	onMount(async () => {
 		chartData = await getChartData();
+		spotifyClient = new SpotifyClient();
 	});
 
 	let birthdayNumberOnes: BirthdayNumberOnes | undefined;
@@ -32,6 +35,9 @@
 
 <h1>Birthday Playlist Generator</h1>
 <p>Generate a Spotify playlist of UK number 1 singles on all your past birthdays.</p>
+<div>
+	<button on:click={spotifyClient ? spotifyClient.login : () => {}}>Login with Spotify</button>
+</div>
 <label>
 	Your date of birth:
 	<input
@@ -54,3 +60,5 @@
 		{/each}
 	{/if}
 </div>
+
+<button on:click={() => spotifyClient?.getUser()?.then(console.log)}>Get user</button>
