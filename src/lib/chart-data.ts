@@ -1,5 +1,11 @@
-import { DateTime, Interval } from 'luxon';
 import findLast from 'lodash/findLast';
+import { DateTime, Interval } from 'luxon';
+import {
+	NoDataReason,
+	type Birthday,
+	type BirthdayNumberOnes,
+	type ChartData
+} from './birthday-number-ones';
 
 const chartJsonUrl =
 	'https://raw.githubusercontent.com/mattmarch/birthday-playlist/refs/heads/chart-data/charts.json';
@@ -11,15 +17,6 @@ type IncomingChartEntry = {
 	weeks_at_number_one: string;
 };
 
-export interface ChartEntry {
-	firstWeekEndDate: DateTime;
-	title: string;
-	artist: string;
-	weeksAtNumberOne: number;
-}
-
-export type ChartData = Array<ChartEntry>;
-
 export const getChartData: () => Promise<ChartData> = async () => {
 	const response = await fetch(chartJsonUrl);
 	const incomingEntries = await response.json();
@@ -30,19 +27,6 @@ export const getChartData: () => Promise<ChartData> = async () => {
 		weeksAtNumberOne: Number(entry.weeks_at_number_one)
 	}));
 };
-
-export type BirthdayNumberOnes = Array<Birthday>;
-
-export type Birthday = {
-	date: DateTime;
-	numberOne: ChartEntry | null;
-	reason: NoDataReason | null;
-};
-
-export enum NoDataReason {
-	NO_DATA_YET,
-	DATE_TOO_OLD
-}
 
 export const findBirthdayNumberOnes = (
 	birthdayDate: Date,

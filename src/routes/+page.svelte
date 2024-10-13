@@ -1,11 +1,7 @@
 <script lang="ts">
-	import {
-		findBirthdayNumberOnes,
-		getChartData,
-		type BirthdayNumberOnes,
-		type ChartData
-	} from '$lib/chart-data';
-	import { SpotifyClient } from '$lib/spotify';
+	import { NoDataReason, type BirthdayNumberOnes, type ChartData } from '$lib/birthday-number-ones';
+	import { findBirthdayNumberOnes, getChartData } from '$lib/chart-data';
+	import { SpotifyClient, type SpotifyProfile } from '$lib/spotify';
 	import { onMount } from 'svelte';
 
 	const currentDate = new Date();
@@ -18,19 +14,19 @@
 
 	let chartData: ChartData | undefined;
 	let spotifyClient: SpotifyClient | undefined;
-	let username: string | null = null;
+	let profile: SpotifyProfile | null = null;
 	onMount(async () => {
 		chartData = await getChartData();
 		spotifyClient = new SpotifyClient();
-		username = await spotifyClient.getProfileName();
+		profile = await spotifyClient.getProfile();
 	});
 
 	let loggingOut = false;
 	const logout = async () => {
 		loggingOut = true;
+		profile = null;
 		await spotifyClient?.logout();
 		loggingOut = false;
-		username = null;
 	};
 
 	let birthdayNumberOnes: BirthdayNumberOnes | undefined;
@@ -41,14 +37,25 @@
 			birthdayNumberOnes = findBirthdayNumberOnes(selectedDate, chartData);
 		}
 	}
+
+	const populateBirthdayNumberOnes = async () => {
+		if (!birthdayNumberOnes) return;
+		birthdayNumberOnes = await spotifyClient?.populateSpotifyInfo(birthdayNumberOnes);
+	};
+
+	const noDataReasons = {
+		[NoDataReason.DATE_TOO_OLD]: 'Birthday precedes the start of the chart data',
+		[NoDataReason.NO_DATA_YET]: 'No chart data yet available for this date'
+	};
 </script>
 
 <h1>Birthday Playlist Generator</h1>
 <p>Generate a Spotify playlist of UK number 1 singles on all your past birthdays.</p>
+<p>This site is currently <i>under construction</i>.</p>
 <div>
 	{#if spotifyClient && !loggingOut}
-		{#if username}
-			<p>Logged in as {username}</p>
+		{#if profile}
+			<p>Logged in as {profile.displayName}</p>
 			<button on:click={logout}>Logout</button>
 		{:else}
 			<p>Not logged in</p>
@@ -70,16 +77,34 @@
 {#if isTodayBirthday}
 	<p>Happy Birthday!</p>
 {/if}
-<div>
-	{#if birthdayNumberOnes}
+
+{#if profile && birthdayNumberOnes}
+	<div>
+		<button on:click={populateBirthdayNumberOnes}>Sync Spotify data</button>
+	</div>
+{/if}
+
+{#if birthdayNumberOnes}
+	<div>
 		{#each birthdayNumberOnes as item}
 			<p>
 				{item.date.year}
 				<br />
-				{item.numberOne?.title}
+				{item.numberOne?.title || (item.reason ? noDataReasons[item.reason] : 'No data')}
 				<br />
-				<i>{item.numberOne?.artist}</i>
+				<i>{item.numberOne?.artist || ''}</i>
+				{#if item.numberOne?.spotifyTrack}
+					<br />
+					<a
+						href={item.numberOne.spotifyTrack.external_urls.spotify}
+						target="_blank"
+						rel="noopener noreferrer"
+						>{item.numberOne.spotifyTrack.name} - {item.numberOne.spotifyTrack.artists
+							.map((a) => a.name)
+							.join(', ')}</a
+					>
+				{/if}
 			</p>
 		{/each}
-	{/if}
-</div>
+	</div>
+{/if}
