@@ -37,10 +37,19 @@
 			birthdayNumberOnes = findBirthdayNumberOnes(selectedDate, chartData);
 		}
 	}
-
+	$: populatedFromSpotify = birthdayNumberOnes?.some((item) => item.numberOne?.spotifyTrack);
 	const populateBirthdayNumberOnes = async () => {
 		if (!birthdayNumberOnes) return;
 		birthdayNumberOnes = await spotifyClient?.populateSpotifyInfo(birthdayNumberOnes);
+	};
+
+	let lastPlaylistUrl: string | undefined;
+	let creatingPlaylist = false;
+	const createPlaylist = async () => {
+		creatingPlaylist = true;
+		if (!birthdayNumberOnes || !profile) return;
+		lastPlaylistUrl = await spotifyClient?.createPlaylist(birthdayNumberOnes, profile.id);
+		creatingPlaylist = false;
 	};
 
 	const noDataReasons = {
@@ -80,7 +89,18 @@
 
 {#if profile && birthdayNumberOnes}
 	<div>
-		<button on:click={populateBirthdayNumberOnes}>Sync Spotify data</button>
+		{#if lastPlaylistUrl}
+			<p>
+				<a href={lastPlaylistUrl} target="_blank" rel="noopener noreferrer">Go to your playlist</a>
+			</p>
+		{/if}
+		{#if populatedFromSpotify}
+			<p>Spotify data synced</p>
+			<button on:click={createPlaylist} disabled={creatingPlaylist}>Create playlist</button>
+		{:else}
+			<p>Spotify data not synced</p>
+			<button on:click={populateBirthdayNumberOnes}>Sync Spotify data</button>
+		{/if}
 	</div>
 {/if}
 
