@@ -10,18 +10,28 @@
 
 	const currentDate = new Date();
 	const minDate = new Date(1900, 0, 1);
-	let selectedDateString: string | undefined = undefined;
+	let selectedDateString: string | undefined;
 	$: selectedDate = selectedDateString ? new Date(selectedDateString) : undefined;
 	$: isTodayBirthday =
 		selectedDate?.getDate() === currentDate.getDate() &&
 		selectedDate?.getMonth() === currentDate.getMonth();
 
-	let chartData: ChartData | undefined = undefined;
-	let spotifyClient: SpotifyClient | undefined = undefined;
+	let chartData: ChartData | undefined;
+	let spotifyClient: SpotifyClient | undefined;
+	let username: string | null = null;
 	onMount(async () => {
 		chartData = await getChartData();
 		spotifyClient = new SpotifyClient();
+		username = await spotifyClient.getProfileName();
 	});
+
+	let loggingOut = false;
+	const logout = async () => {
+		loggingOut = true;
+		await spotifyClient?.logout();
+		loggingOut = false;
+		username = null;
+	};
 
 	let birthdayNumberOnes: BirthdayNumberOnes | undefined;
 	$: {
@@ -36,7 +46,17 @@
 <h1>Birthday Playlist Generator</h1>
 <p>Generate a Spotify playlist of UK number 1 singles on all your past birthdays.</p>
 <div>
-	<button on:click={spotifyClient ? spotifyClient.login : () => {}}>Login with Spotify</button>
+	{#if spotifyClient && !loggingOut}
+		{#if username}
+			<p>Logged in as {username}</p>
+			<button on:click={logout}>Logout</button>
+		{:else}
+			<p>Not logged in</p>
+			<button on:click={spotifyClient.login}>Login with Spotify</button>
+		{/if}
+	{:else}
+		<p>Loading...</p>
+	{/if}
 </div>
 <label>
 	Your date of birth:
@@ -53,12 +73,13 @@
 <div>
 	{#if birthdayNumberOnes}
 		{#each birthdayNumberOnes as item}
-			<div>
-				<p>{item.numberOne?.title}</p>
-				<p><i>{item.numberOne?.artist}</i></p>
-			</div>
+			<p>
+				{item.date.year}
+				<br />
+				{item.numberOne?.title}
+				<br />
+				<i>{item.numberOne?.artist}</i>
+			</p>
 		{/each}
 	{/if}
 </div>
-
-<button on:click={() => spotifyClient?.getUser()?.then(console.log)}>Get user</button>
