@@ -58,7 +58,7 @@
 	};
 </script>
 
-<h1>Birthday Playlist Generator</h1>
+<h1 class="text-rose-900">Birthday Playlist Generator</h1>
 <p>Generate a Spotify playlist of UK number 1 singles on all your past birthdays.</p>
 <p>This site is currently <i>under construction</i>.</p>
 <div>
