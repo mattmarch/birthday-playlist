@@ -6,8 +6,7 @@
 	onMount(async () => {
 		const spotifyClient = new SpotifyClient();
 		const result = await spotifyClient.loginCallback();
-		console.log(result);
-		await goto('/');
+		await goto(`/?date=${result.state}`);
 	});
 </script>
 

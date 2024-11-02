@@ -3,14 +3,21 @@
 	import { findBirthdayNumberOnes, getChartData } from '$lib/chart-data';
 	import { SpotifyClient, type SpotifyProfile } from '$lib/spotify';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { goto, replaceState } from '$app/navigation';
 
 	const currentDate = new Date();
 	const minDate = new Date(1900, 0, 1);
-	let selectedDateString: string | undefined;
+	let selectedDateString: string | undefined = $page.url.searchParams.get('date') || undefined;
 	$: selectedDate = selectedDateString ? new Date(selectedDateString) : undefined;
 	$: isTodayBirthday =
 		selectedDate?.getDate() === currentDate.getDate() &&
 		selectedDate?.getMonth() === currentDate.getMonth();
+
+	const updateUrl = () => {
+		$page.url.searchParams.set('date', selectedDateString || '');
+		replaceState($page.url, $page.state);
+	};
 
 	let chartData: ChartData | undefined;
 	let spotifyClient: SpotifyClient | undefined;
@@ -77,7 +84,10 @@
 						>
 					{:else}
 						<button
-							on:click={spotifyClient.login}
+							on:click={() =>
+								spotifyClient
+									? spotifyClient.login(selectedDateString)
+									: console.error("SpotifyClient undefined- this shouldn't happen")}
 							class="text-white bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-rose-300 dark:focus:ring-rose-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
 							>Login with Spotify</button
 						>
@@ -100,6 +110,7 @@
 			bind:value={selectedDateString}
 			min={minDate.toISOString().split('T')[0]}
 			max={currentDate.toISOString().split('T')[0]}
+			on:change={updateUrl}
 		/>
 	</label>
 	{#if isTodayBirthday}

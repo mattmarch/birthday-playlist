@@ -32,7 +32,7 @@ export class SpotifyClient {
 		});
 	}
 
-	public login = (): Promise<void> => this.userManager.signinRedirect();
+	public login = (date?: string): Promise<void> => this.userManager.signinRedirect({ state: date });
 
 	public loginCallback = (): Promise<User> => this.userManager.signinRedirectCallback();
 
