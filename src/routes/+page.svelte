@@ -103,14 +103,18 @@
 		/>
 	</label>
 	{#if isTodayBirthday}
-		<p>Happy Birthday!</p>
+		<p class="text-lg">Happy Birthday! 🎉🎉🎉</p>
 	{/if}
 
 	{#if profile && birthdayNumberOnes}
 		<div>
 			{#if lastPlaylistUrl}
 				<p>
-					<a href={lastPlaylistUrl} target="_blank" rel="noopener noreferrer">Go to your playlist</a
+					<a
+						href={lastPlaylistUrl}
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-rose-400 underline hover:text-rose-600">Go to your playlist</a
 					>
 				</p>
 			{/if}
@@ -134,9 +138,9 @@
 	{/if}
 
 	{#if birthdayNumberOnes}
-		<div>
+		<div class="flex flex-wrap">
 			{#each birthdayNumberOnes as item}
-				<p>
+				<div class="flex flex-col p-4 bg-zinc-50 drop-shadow-lg border-2 w-60 h-80 m-10">
 					{item.date.year}
 					<br />
 					{item.numberOne?.title || (item.reason ? noDataReasons[item.reason] : 'No data')}
@@ -148,12 +152,13 @@
 							href={item.numberOne.spotifyTrack.external_urls.spotify}
 							target="_blank"
 							rel="noopener noreferrer"
+							class="text-rose-400 underline hover:text-rose-600"
 							>{item.numberOne.spotifyTrack.name} - {item.numberOne.spotifyTrack.artists
 								.map((a) => a.name)
 								.join(', ')}</a
 						>
 					{/if}
-				</p>
+				</div>
 			{/each}
 		</div>
 	{/if}
