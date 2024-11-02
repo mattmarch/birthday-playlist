@@ -1,6 +1,7 @@
-import { type ChartData, findBirthdayNumberOne, NoDataReason } from './chart-data';
+import { findBirthdayNumberOne } from './chart-data';
 import { DateTime } from 'luxon';
 import { describe, it, expect } from 'vitest';
+import { type ChartData, NoDataReason } from '$lib/birthday-number-ones';
 
 const singleEntryOneWeek: ChartData = [
 	{

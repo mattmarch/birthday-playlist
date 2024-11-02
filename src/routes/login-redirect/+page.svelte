@@ -7,7 +7,7 @@
 		const spotifyClient = new SpotifyClient();
 		const result = await spotifyClient.loginCallback();
 		console.log(result);
-		goto('/');
+		await goto('/');
 	});
 </script>
 
