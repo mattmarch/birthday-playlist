@@ -25,7 +25,7 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
       - name: Make changes to charts-data branch
         run: |
-            git checkout -b charts-data
+            git checkout chart-data
             mv latest-charts.json charts.json
             git commit charts.json -m "Update charts data from Github Action"
       - name: Push changes to charts-data branch
