@@ -98,7 +98,10 @@
 		<p class="italic text-zinc-800">
 			Generate a Spotify playlist of UK number 1 singles on all your past birthdays.
 		</p>
-		<p class="text-zinc-800">🚧 This site is currently <i>under construction</i> 🚧</p>
+		<p class="text-zinc-800">
+			🚧 This site is currently awaiting Spotify to approve it for everyone to use. If you want to
+			make use of it before then let me know and I can invite you. 🚧
+		</p>
 	</div>
 
 	<label>
