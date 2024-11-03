@@ -77,7 +77,7 @@
 >
 	<div class="flex flex-col gap-3">
 		<div class="flex flex-row justify-between items-baseline flex-wrap">
-			<h1 class="text-rose-900 text-3xl w-fit">🎂 Birthday Playlist Generator 🎂</h1>
+			<h1 class="text-rose-900 text-3xl w-fit">🎂 Birthday Playlist 🎂</h1>
 			<div class="py-4">
 				{#if spotifyClient && !loggingOut}
 					{#if profile}
@@ -98,13 +98,14 @@
 	</div>
 
 	<label>
-		Your date of birth:
+		Enter your date of birth to get started: <br />
 		<input
 			type="date"
 			bind:value={selectedDateString}
 			min={minDate.toISOString().split('T')[0]}
 			max={currentDate.toISOString().split('T')[0]}
 			on:change={updateUrl}
+			class="mt-2 ml-4"
 		/>
 	</label>
 	{#if isTodayBirthday}
