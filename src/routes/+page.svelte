@@ -133,7 +133,7 @@
 	{/if}
 
 	{#if birthdayNumberOnes}
-		<div class="flex flex-wrap">
+		<div class="flex flex-wrap justify-center">
 			{#each birthdayNumberOnes as item}
 				<SingleCard birthdayNumberOne={item} />
 			{/each}
