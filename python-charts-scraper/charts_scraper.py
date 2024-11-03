@@ -36,7 +36,7 @@ def verify_chart_data(chart_data):
 if __name__ == '__main__':
     entries = parse_official_charts('https://www.officialcharts.com/chart-news/all-the-number-1-singles__7931')
     verify_chart_data(entries)
-    with open('charts.json', 'w') as file:
+    with open('latest-charts.json', 'w') as file:
         file.write(json.dumps(entries))
     # Optional '-u' arg to upload result to JSONBIN
     if len(sys.argv) > 1 and '-u' in sys.argv[1:]:

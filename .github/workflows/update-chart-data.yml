@@ -1,0 +1,29 @@
+name: Update chart data
+
+on: workflow_dispatch
+
+jobs:
+  update-chart-data:
+    name: Update chart data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Run charts scraper
+        run: python python-charts-scraper/charts_scraper.py
+      - name: Setup git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Make changes to charts-data branch
+        run: |
+            git checkout -b charts-data
+            mv latest-charts.json charts.json
+            git commit charts.json -m "Update charts data from Github Action"
+      - name: Push changes to charts-data branch
+        run: |
+            git push origin charts-data
