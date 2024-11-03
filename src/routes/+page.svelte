@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { NoDataReason, type BirthdayNumberOnes, type ChartData } from '$lib/birthday-number-ones';
+	import { type BirthdayNumberOnes, type ChartData } from '$lib/birthday-number-ones';
 	import { findBirthdayNumberOnes, getChartData } from '$lib/chart-data';
 	import { SpotifyClient, type SpotifyProfile } from '$lib/spotify';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { goto, replaceState } from '$app/navigation';
+	import { replaceState } from '$app/navigation';
+	import Button from './Button.svelte';
+	import SingleCard from './SingleCard.svelte';
 
 	const currentDate = new Date();
 	const minDate = new Date(1900, 0, 1);
@@ -29,6 +31,14 @@
 			profile = await spotifyClient.getProfile();
 		}
 	});
+
+	const login = () => {
+		if (!spotifyClient) {
+			console.error('Spotify client undefined - this should not happen');
+			return;
+		}
+		spotifyClient.login(selectedDateString);
+	};
 
 	let loggingOut = false;
 	const logout = async () => {
@@ -60,11 +70,6 @@
 		lastPlaylistUrl = await spotifyClient?.createPlaylist(birthdayNumberOnes, profile.id);
 		creatingPlaylist = false;
 	};
-
-	const noDataReasons = {
-		[NoDataReason.DATE_TOO_OLD]: 'Birthday precedes the start of the chart data',
-		[NoDataReason.NO_DATA_YET]: 'No chart data yet available for this date'
-	};
 </script>
 
 <div
@@ -77,20 +82,9 @@
 				{#if spotifyClient && !loggingOut}
 					{#if profile}
 						<span class="text-center pr-1">Hello <strong>{profile.displayName}</strong>!</span>
-						<button
-							on:click={logout}
-							class="text-white bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-rose-300 dark:focus:ring-rose-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-							>Logout</button
-						>
+						<Button on:click={logout}>Logout</Button>
 					{:else}
-						<button
-							on:click={() =>
-								spotifyClient
-									? spotifyClient.login(selectedDateString)
-									: console.error("SpotifyClient undefined- this shouldn't happen")}
-							class="text-white bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-rose-300 dark:focus:ring-rose-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-							>Login with Spotify</button
-						>
+						<Button on:click={login}>Login with Spotify</Button>
 					{/if}
 				{:else}
 					<span>Loading...</span>
@@ -125,25 +119,14 @@
 						href={lastPlaylistUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-rose-400 underline hover:text-rose-600">Go to your playlist</a
+						class="text-rose-600 underline hover:text-rose-800">Go to your playlist</a
 					>
 				</p>
 			{/if}
 			{#if populatedFromSpotify}
-				<p>Spotify data synced</p>
-				<button
-					on:click={createPlaylist}
-					disabled={creatingPlaylist}
-					class="text-white bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-rose-300 dark:focus:ring-rose-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-					>Create playlist</button
-				>
+				<Button on:click={createPlaylist} disabled={creatingPlaylist}>Create playlist</Button>
 			{:else}
-				<p>Spotify data not synced</p>
-				<button
-					on:click={populateBirthdayNumberOnes}
-					class="text-white bg-gradient-to-r from-rose-500 via-rose-600 to-rose-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-rose-300 dark:focus:ring-rose-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-					>Sync Spotify data</button
-				>
+				<Button on:click={populateBirthdayNumberOnes}>Sync Spotify data</Button>
 			{/if}
 		</div>
 	{/if}
@@ -151,25 +134,7 @@
 	{#if birthdayNumberOnes}
 		<div class="flex flex-wrap">
 			{#each birthdayNumberOnes as item}
-				<div class="flex flex-col p-4 bg-zinc-50 drop-shadow-lg border-2 w-60 h-80 m-10">
-					{item.date.year}
-					<br />
-					{item.numberOne?.title || (item.reason ? noDataReasons[item.reason] : 'No data')}
-					<br />
-					<i>{item.numberOne?.artist || ''}</i>
-					{#if item.numberOne?.spotifyTrack}
-						<br />
-						<a
-							href={item.numberOne.spotifyTrack.external_urls.spotify}
-							target="_blank"
-							rel="noopener noreferrer"
-							class="text-rose-400 underline hover:text-rose-600"
-							>{item.numberOne.spotifyTrack.name} - {item.numberOne.spotifyTrack.artists
-								.map((a) => a.name)
-								.join(', ')}</a
-						>
-					{/if}
-				</div>
+				<SingleCard birthdayNumberOne={item} />
 			{/each}
 		</div>
 	{/if}

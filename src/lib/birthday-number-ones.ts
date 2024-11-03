@@ -13,6 +13,11 @@ export enum NoDataReason {
 	DATE_TOO_OLD
 }
 
+export const noDataReasonStrings = {
+	[NoDataReason.DATE_TOO_OLD]: 'Birthday precedes the start of the chart data',
+	[NoDataReason.NO_DATA_YET]: 'No chart data yet available for this date'
+};
+
 export interface ChartEntry {
 	firstWeekEndDate: DateTime;
 	title: string;
