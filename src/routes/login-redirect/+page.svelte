@@ -6,6 +6,9 @@
 	onMount(async () => {
 		const spotifyClient = new SpotifyClient();
 		const result = await spotifyClient.loginCallback();
+		if (!result) {
+			alert('Something went wrong authenticating with Spotify!');
+		}
 		await goto(`/?date=${result.state}`);
 	});
 </script>
