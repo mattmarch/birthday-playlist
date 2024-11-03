@@ -28,7 +28,11 @@
 		chartData = await getChartData();
 		spotifyClient = new SpotifyClient();
 		if (await spotifyClient.isLoggedIn()) {
-			profile = await spotifyClient.getProfile();
+			try {
+				profile = await spotifyClient.getProfile();
+			} catch {
+				alert('Something went wrong authenticating with Spotify.');
+			}
 		}
 	});
 
